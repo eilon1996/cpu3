@@ -21,7 +21,7 @@ architecture arc_sys of ALU is
     component AdderSub is
         PORT (  a, b : IN STD_LOGIC_VECTOR (Dwidth-1 DOWNTO 0);
                 result : OUT STD_LOGIC_VECTOR (Dwidth-1 DOWNTO 0);
-                carry_in : OUT std_logic;
+                carry_in : in std_logic;
                 sub, carry_out : OUT std_logic);
     end component;
 

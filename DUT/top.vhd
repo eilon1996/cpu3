@@ -20,6 +20,8 @@ end top;
 architecture arc_sys of top is
 
 -----------logic-------
+-- TODO handle get instraction and update PC
+
 -- R type
 -- 1 - insert ra to RF
 -- 2 - insert Ra to A, rb to RF
@@ -27,12 +29,12 @@ architecture arc_sys of top is
 -- 4 - insert C to out (cout)
 
 -- J type
---  insert A (offset)
---  insert B (PC), cin = 1, calc with A res enter C
---  get C out
+-- 1 - insert PC to A
+-- 2 - insert offset to B + carry_in = 1 + calc with A res enter C
+-- 3 - get C out
 
 -- I type
---  no action needed
+--  ?
 
 
 variable state :integer :=0;
@@ -43,6 +45,7 @@ signal wrRFen, RFout:std_logic;
 signal Cin, Ain, Cout, Cflag, Zflag, Nflag  :std_logic;
 -- dataOut signals
 signal IR :std_logic_vector(3 downto 0);
+signal PCin, PCout :std_logic;
 ----
 
 signal data_bus:std_logic_vector(n-1 downto 0);
@@ -52,6 +55,8 @@ alias OPC : std_logic_vector(3 downto 0) is IR(15 downto 12);
 alias ra : std_logic_vector(3 downto 0) is IR(11 downto 8);
 alias rb : std_logic_vector(3 downto 0) is IR(7 downto 4);
 alias rc : std_logic_vector(3 downto 0) is IR(3 downto 0);
+alias offsetAddress : std_logic_vector(4 downto 0) is IR(4 downto 0);
+alias immidiet : std_logic_vector(7 downto 0) is IR(7 downto 0);
 
 --subtype opc_type is  std_logic_vector(1 downto 0);
 alias OPC_type : std_logic_vector(1 downto 0) is OPC(3 downto 2);
@@ -127,12 +132,51 @@ PROCESS (x, rst, clk, ena)
 				Cin <= '0';
 				Cout <= '1';
 				wrRFen <= '1';
+				pc <= pc+1;
 			END IF;
 
 		ELSIF(OPC_type=J_type) THEN
-		--
+			IF(OPC(1 downto 0)="00" or (OPC(1 downto 0)="01" and Cflag='1') or (OPC(1 downto 0)="10" and Cflag='0')) THEN
+				IF(state=0) THEN
+					--insert dataOut to IR
+				ELSIF(state=1) THEN
+					-- insert PC to A
+					PCout <= '1';
+					Ain <= '1';
+					Cout <= '0';
+				ELSIF(state=2) THEN
+
+	-- 2 - insert offset to B + carry_in = 1 + calc with A res enter C
+					dataBus(4 downto 0) <= offsetAddress; -- add sign extention
+					Ain <= '0';
+					Cin <= '1';
+					carry_in <= '1';
+					Cout <= '0';
+				ELSIF(state=3) THEN
+				-- 3 - get C out
+					Ain <= '0';
+					Cin <= '0';
+					Cout <= '1';
+					PCin <= '1';
+				END IF;
+			ELSIF
+				PC <= PC+1; --impliment
+			END IF;
+
 		ELSIF(OPC_type=I_type) THEN
-		--
+
+			IF(state=0) THEN
+				--insert dataOut to IR
+			ELSIF(state=1) THEN
+				readAddr <= ra;
+				RFout <= '1';
+				Ain <= '0';
+				Cout <= '0';
+				wrRFen <= '1';
+				dataBus(7 downto 0) <= immidiet; -- add sign extention
+				pc <= pc+1;
+			END IF;
+
 		END IF;
 	END IF;
 
