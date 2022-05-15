@@ -9,13 +9,13 @@ entity PC is
     port(	clk, PCin: in std_logic;
             PCsel:	in std_logic_vector(1 downto 0);
             offset:	in std_logic_vector(4 downto 0);
-            PC_value :buffer std_logic_vector(Dwidth-1 downto 0);
+            PC_out :out std_logic_vector(Dwidth-1 downto 0)
         );
 end PC;
 ------------- complete the ALU Architecture code --------------
-architecture arc_sys of ALU is
+architecture PC_rtl of PC is
 
-signal PC_value_plus1, PC_value_plus_offset: std_logic_vector(Dwidth-1 downto 0);
+signal PC_value, PC_value_plus1, PC_value_plus_offset: std_logic_vector(Dwidth-1 downto 0);
 
 begin
 
@@ -24,7 +24,7 @@ plus1_pm: AdderSub port map(
     carry_in => '1',
     a => PC_value,
     b => (others => '0'),
-    result => PC_value_plus1,
+    result => PC_value_plus1
 );
 
 plus_offset_pm: AdderSub port map(
@@ -32,11 +32,16 @@ plus_offset_pm: AdderSub port map(
     carry_in => '0',
     a => PC_value_plus1,
     b => offset,
-    result => PC_value_plus_offset,
+    result => PC_value_plus_offset
 );
 
 WITH PCsel SELECT
-PC_value    <=  (others => 0)        when "00",
+PC_value    <=  (others => '0')        when "00",
                 PC_value_plus_offset when "01",
                 PC_value_plus1       when "10",
                 UNAFFECTED when others ;
+
+
+PC_out <= PC_value;
+
+end PC_rtl;

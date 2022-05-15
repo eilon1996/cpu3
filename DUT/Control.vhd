@@ -3,47 +3,41 @@ USE ieee.std_logic_1164.all;
 USE ieee.std_logic_unsigned.all;
 USE work.aux_package.all;
 -------------------------------------------------------------
-entity top is
-	generic (
-		n : positive := 8 ;
-		m : positive := 7 ;
-		k : positive := 3
-	); -- where k=log2(m+1)
+entity Control is
+    GENERIC (OPC_length : INTEGER := 4);
 	port(
         rst, ena, clk: in std_logic;    --from tb
         done: out std_logic;            --to tb
-		mov, done, nop, jnc, jc, jmp, sub, add, Nflag, Zflag, Cflag : in std_logic;  --status
-		Cout, Cin, Ain, wrRFen, RDout, IRin, PCin, Imm_in : out std_logic;    --control
+		mov, done_code, nop, jnc, jc, jmp, sub, add, Nflag, Zflag, Cflag : in std_logic;  --status
+		Cout, Cin, Ain, wrRFen, RFout, IRin, PCin, Imm_in : out std_logic;    --control
         PCsel, RFaddr: out std_logic_vector(1 downto 0);                                    --control
-        OPC: out std_logic_vector(3 downto 0);                                       --control
+        OPC_in: in std_logic_vector(OPC_length-1 downto 0);                                       --control
+        OPC: out std_logic_vector(OPC_length-1 downto 0)                                       --control
     );
-end top;
-------------- complete the top Architecture code --------------
-architecture arc_sys of top is
+end Control;
+
+architecture arc_sys of Control is
 
 -----------logic-------
--- TODO handle get instraction and update PC
 
 -- R type
 -- 1 - insert ra to RF
--- 2 - insert Ra to A, rb to RF
--- 3 - insert Rb to B + calc with A, res enter C, insert rc to RF + enable writing
--- 4 - insert C to out (cout)
+-- 2 - rb to RF, Rb to b, b calc with A to C
+-- 3 - insert rc to RF + enable writing, cout
+-- 4 - done
 
 -- Jmp
 -- 1 - pc = pc+offset
 -- 2 - done
 
 -- Jc/jnc
--- 1 - if(carry/notcarry) pc = pc+offset
+-- 1 - if(carry/no carry) pc = pc+offset
 -- 2 - done
 
 -- I type
--- 1 - insert ra to RF, immidiet + sign extention,
--- 2
+-- 1 - insert ra to writeAddr, wrRFen, immidiet + sign extention to bus,
+-- 2 - done
 
-
-variable state :integer :=0;
 signal opc_type : std_logic_vector(1 downto 0);
 
 
@@ -53,139 +47,283 @@ constant J_type   : std_logic_vector(1 downto 0) := "01";
 constant I_type   : std_logic_vector(1 downto 0) := "10";
 
 BEGIN
--------- handle register file -----
---TODO: add componnent
 
-
-
-RF_pm: RF port map(
-	clk => clk,
-	rst => rst,
-	WregEn => WregEn,
-
-	WregData => WregData,
-	WregData => WregData,
-	RregAddr => RregAddr,
-	RregData => RregData
-);
+opc_type <= opc_in(OPC_length-1 downto OPC_length-2);  ---?
+PCsel <= "01" when (jmp='1' or (jc='1' and Cflag='1') or (jnc='1' and Cflag='0')) else "10";
 
 
 FSM_PROC : process(clk)
+variable state :integer range 1 to 4 :=1;
 begin
     if rst = '1' then
-        state <= IDLE;
+        Cout    <=  '0';
+        Cin     <=  '0';
+        Ain     <=  '0';
+        wrRFen  <=  '0';
+        RFout   <=  '0';
+        IRin    <=  '0';
+        PCin    <=  '0';
+        Imm_in  <=  '0';
+        RFaddr  <=  "00";
+        OPC     <=  "0000";
+        done    <=  '0';
+        state := 0;
 
     elsif ena = '0' then
-        state <= IDLE;
+        Cout    <=  '0';
+        Cin     <=  '0';
+        Ain     <=  '0';
+        wrRFen  <=  '0';
+        RFout   <=  '0';
+        IRin    <=  '0';
+        PCin    <=  '0';
+        Imm_in  <=  '0';
+        RFaddr  <=  "00";
+        OPC     <=  "0000";
+        done    <=  '0';
+        state := state;
+
+    elsif done_code = '1' then
+        Cout    <=  '0';
+        Cin     <=  '0';
+        Ain     <=  '0';
+        wrRFen  <=  '0';
+        RFout   <=  '0';
+        IRin    <=  '0';
+        PCin    <=  '0';
+        Imm_in  <=  '0';
+        RFaddr  <=  "00";
+        OPC     <=  "0000";
+        done    <=  '1';
+        state := 0;
 
     elsif rising_edge(clk) then
         case state is
 
             when 1 =>
-            case opc_type is
 
-                when R_type =>
-                    readAddr <= ra;
-                    RFout <= '1';
-                    Ain <= '0';
-                    Cout <= '0';
-                    wrRFen <= '0';
-                when 1 =>
-                when 1 =>
-                when 1 =>
+                if opc_type=R_type then
+                -- insert ra to RF, Ra to A
+                    Cout    <=  '0';
+                    Cin     <=  '0';
+                    Ain     <=  '1';
+                    wrRFen  <=  '0';
+                    RFout   <=  '1';
+                    IRin    <=  '0';
+                    PCin    <=  '0';
+                    Imm_in  <=  '0';
+                    RFaddr  <=  "11";
+                    OPC     <=  "0000";
+                    done    <=  '0';
+                    state := state + 1;
+                elsif opc_type=R_type then
+                -- insert ra to RF, Ra to A
+                    Cout    <=  '0';
+                    Cin     <=  '0';
+                    Ain     <=  '1';
+                    wrRFen  <=  '0';
+                    RFout   <=  '1';
+                    IRin    <=  '0';
+                    PCin    <=  '0';
+                    Imm_in  <=  '0';
+                    RFaddr  <=  "00";
+                    OPC     <=  "0000";
+                    done    <=  '0';
+                    state := state + 1;
+                elsif opc_type=J_type then
+                -- pc = pc+offset
+                    Cout    <=  '0';
+                    Cin     <=  '0';
+                    Ain     <=  '0';
+                    wrRFen  <=  '0';
+                    RFout   <=  '0';
+                    IRin    <=  '0';
+                    PCin    <=  '1';
+                    Imm_in  <=  '0';
+                    RFaddr  <=  "00";
+                    OPC     <=  "0000";
+                    done    <=  '0';
+                    state := state + 1;
 
+                elsif opc_type=I_type then
+                -- insert ra to writeAddr, wrRFen, immidiet + sign extention to bus,
+                    Cout    <=  '0';
+                    Cin     <=  '0';
+                    Ain     <=  '0';
+                    wrRFen  <=  '1';
+                    RFout   <=  '0';
+                    IRin    <=  '0';
+                    PCin    <=  '0';
+                    Imm_in  <=  '1';
+                    RFaddr  <=  "00";
+                    OPC     <=  "0000";
+                    done    <=  '0';
+                    state := state + 1;
+                else
+                    Cout    <=  '0';
+                    Cin     <=  '0';
+                    Ain     <=  '0';
+                    wrRFen  <=  '0';
+                    RFout   <=  '0';
+                    IRin    <=  '0';
+                    PCin    <=  '0';
+                    Imm_in  <=  '0';
+                    RFaddr  <=  "00";
+                    OPC     <=  "0000";
+                    done    <=  '0';
+                    state := state;
+                end if;
 
+            when 2 =>
+
+                if nop='1' then
+                -- rb to RF, Rb to b, b calc with A to C
+                    Cout    <=  '0';
+                    Cin     <=  '1';
+                    Ain     <=  '0';
+                    wrRFen  <=  '0';
+                    RFout   <=  '1';
+                    IRin    <=  '0';
+                    PCin    <=  '0';
+                    Imm_in  <=  '0';
+                    RFaddr  <=  "11";
+                    OPC     <=  "0000";
+                    done    <=  '0';
+                    state := state + 1;
+                elsif opc_type=R_type then
+                -- rb to RF, Rb to b, b calc with A to C
+                    Cout    <=  '0';
+                    Cin     <=  '1';
+                    Ain     <=  '0';
+                    wrRFen  <=  '0';
+                    RFout   <=  '1';
+                    IRin    <=  '0';
+                    PCin    <=  '0';
+                    Imm_in  <=  '0';
+                    RFaddr  <=  "01";
+                    OPC     <=  "0000";
+                    done    <=  '0';
+                    state := state + 1;
+
+                elsif opc_type=J_type then
+                -- pc = pc+offset
+                    Cout    <=  '0';
+                    Cin     <=  '0';
+                    Ain     <=  '0';
+                    wrRFen  <=  '0';
+                    RFout   <=  '0';
+                    IRin    <=  '0';
+                    PCin    <=  '1';
+                    Imm_in  <=  '0';
+                    RFaddr  <=  "00";
+                    OPC     <=  "0000";
+                    done    <=  '1';
+                    state := 0;
+
+                elsif opc_type=I_type then
+                -- insert ra to writeAddr, wrRFen, immidiet + sign extention to bus,
+                    Cout    <=  '0';
+                    Cin     <=  '0';
+                    Ain     <=  '0';
+                    wrRFen  <=  '0';
+                    RFout   <=  '0';
+                    IRin    <=  '0';
+                    PCin    <=  '0';
+                    Imm_in  <=  '1';
+                    RFaddr  <=  "00";
+                    OPC     <=  "0000";
+                    done    <=  '1';
+                    state := 0;
+                else
+                    Cout    <=  '0';
+                    Cin     <=  '0';
+                    Ain     <=  '0';
+                    wrRFen  <=  '0';
+                    RFout   <=  '0';
+                    IRin    <=  '0';
+                    PCin    <=  '0';
+                    Imm_in  <=  '0';
+                    RFaddr  <=  "00";
+                    OPC     <=  "0000";
+                    done    <=  '0';
+                    state := state;
+
+                end if;
+
+            when 3 =>
+                if opc_type=R_type then
+                -- insert rc to RF + enable writing, cout
+                    Cout    <=  '1';
+                    Cin     <=  '0';
+                    Ain     <=  '0';
+                    wrRFen  <=  '1';
+                    RFout   <=  '0';
+                    IRin    <=  '0';
+                    PCin    <=  '0';
+                    Imm_in  <=  '0';
+                    RFaddr  <=  "11";
+                    OPC     <=  "0000";
+                    done    <=  '0';
+                    state := state + 1;
+                elsif opc_type=R_type then
+                -- insert rc to RF + enable writing, cout
+                    Cout    <=  '1';
+                    Cin     <=  '0';
+                    Ain     <=  '0';
+                    wrRFen  <=  '1';
+                    RFout   <=  '0';
+                    IRin    <=  '0';
+                    PCin    <=  '0';
+                    Imm_in  <=  '0';
+                    RFaddr  <=  "10";
+                    OPC     <=  "0000";
+                    done    <=  '0';
+                    state := state + 1;
+                else
+                    Cout    <=  '0';
+                    Cin     <=  '0';
+                    Ain     <=  '0';
+                    wrRFen  <=  '0';
+                    RFout   <=  '0';
+                    IRin    <=  '0';
+                    PCin    <=  '0';
+                    Imm_in  <=  '0';
+                    RFaddr  <=  "00";
+                    OPC     <=  "0000";
+                    done    <=  '0';
+                    state := state;
+                end if;
+            when 4 =>
+                if opc_type=R_type then
+                -- insert rc to RF + enable writing, cout
+                    Cout    <=  '0';
+                    Cin     <=  '0';
+                    Ain     <=  '0';
+                    wrRFen  <=  '0';
+                    RFout   <=  '0';
+                    IRin    <=  '0';
+                    PCin    <=  '0';
+                    Imm_in  <=  '0';
+                    RFaddr  <=  "00";
+                    OPC     <=  "0000";
+                    done    <=  '1';
+                    state := 0;
+                else
+                    Cout    <=  '0';
+                    Cin     <=  '0';
+                    Ain     <=  '0';
+                    wrRFen  <=  '0';
+                    RFout   <=  '0';
+                    IRin    <=  '0';
+                    PCin    <=  '0';
+                    Imm_in  <=  '0';
+                    RFaddr  <=  "00";
+                    OPC     <=  "0000";
+                    done    <=  '0';
+                    state := state;
+                end if;
             end case;
-
-        end if;
     end if;
 end process;
 
-
-
-
-
---TODO: similar to below but with out the clock
-PROCESS (x, rst, clk, ena)
-
-	BEGIN
-	IF (ena = '1')	THEN			-- if enable bit is on than save the current state
-	--
-	ELSIF (rst = '1')	THEN			-- if enable bit is on than save the current state
-	--
-	ELSIF (rising_edge(clk)) THEN
-		IF(OPC_type=R_type) THEN
-			IF(state=0) THEN
-				--insert dataOut to IR
-			ELSIF(state=1) THEN
-				readAddr <= ra;
-				RFout <= '1';
-				Ain <= '0';
-				Cout <= '0';
-				wrRFen <= '0';
-			ELSIF(state=2) THEN
-				readAddr <= rb;
-				RFout <= '1';
-				Ain <= '1';
-				Cin <= '0';
-				Cout <= '0';
-				wrRFen <= '0';
-			ELSIF(state=3) THEN
-				readAddr <= rc;
-				RFout <= '1';
-				Ain <= '0';
-				Cin <= '1';
-				Cout <= '0';
-			ELSIF(state=4) THEN
-				RFout <= '0';
-				Ain <= '0';
-				Cin <= '0';
-				Cout <= '1';
-				wrRFen <= '1';
-				pc <= pc+1;
-			END IF;
-
-		ELSIF(OPC_type=J_type) THEN
-			IF(OPC(1 downto 0)="00" or (OPC(1 downto 0)="01" and Cflag='1') or (OPC(1 downto 0)="10" and Cflag='0')) THEN
-				IF(state=0) THEN
-					--insert dataOut to IR
-				ELSIF(state=1) THEN
-					-- insert PC to A
-					PCout <= '1';
-					Ain <= '1';
-					Cout <= '0';
-				ELSIF(state=2) THEN
-
-	-- 2 - insert offset to B + carry_in = 1 + calc with A res enter C
-					dataBus(4 downto 0) <= offsetAddress; -- add sign extention
-					Ain <= '0';
-					Cin <= '1';
-					carry_in <= '1';
-					Cout <= '0';
-				ELSIF(state=3) THEN
-				-- 3 - get C out
-					Ain <= '0';
-					Cin <= '0';
-					Cout <= '1';
-					PCin <= '1';
-				END IF;
-			ELSIF
-				PC <= PC+1; --impliment
-			END IF;
-
-		ELSIF(OPC_type=I_type) THEN
-
-			IF(state=0) THEN
-				--insert dataOut to IR
-			ELSIF(state=1) THEN
-				readAddr <= ra;
-				RFout <= '1';
-				Ain <= '0';
-				Cout <= '0';
-				wrRFen <= '1';
-				dataBus(7 downto 0) <= immidiet; -- add sign extention
-				pc <= pc+1;
-			END IF;
-
-		END IF;
-	END IF;
+end arc_sys;
