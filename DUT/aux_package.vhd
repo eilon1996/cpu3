@@ -34,6 +34,16 @@ package aux_package is
 	end component;
 
 -----------------------------------------------------------------
+	component ProgMem is
+		generic( Dwidth: integer := 16;
+		 		 Awidth: integer := 6;
+				 dept:   integer := 64);
+		port(   clk: in std_logic;
+				 memDataIn:	in std_logic_vector(m-1 downto 0);
+				 rfDataIn : in std_logic_vector(n-1 downto 0);
+				 rfDataOut: out std_logic_vector(n-1 downto 0)
+		 );
+	end component;
 
 	component PC is
 
@@ -42,7 +52,7 @@ package aux_package is
 	port(	clk, PCin: in std_logic;
 			PCsel:	in std_logic_vector(1 downto 0);
 			offset:	in std_logic_vector(4 downto 0);
-			PC_value :buffer std_logic_vector(Dwidth-1 downto 0)
+			PC_out :buffer std_logic_vector(Dwidth-1 downto 0)
 	);
 	end component;
 

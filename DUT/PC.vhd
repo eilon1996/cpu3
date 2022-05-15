@@ -22,7 +22,7 @@ begin
 plus1_pm: AdderSub port map(
     sub => '0',
     carry_in => '1',
-    a => PC_value,
+    a => PC_out,
     b => (others => '0'),
     result => PC_value_plus1
 );
@@ -36,7 +36,7 @@ plus_offset_pm: AdderSub port map(
 );
 
 WITH PCsel SELECT
-PC_value    <=  (others => '0')        when "00",
+PC_out    <=  (others => 0)        when "00",
                 PC_value_plus_offset when "01",
                 PC_value_plus1       when "10",
                 UNAFFECTED when others ;

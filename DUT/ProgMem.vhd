@@ -7,11 +7,11 @@ entity ProgMem is
 generic( Dwidth: integer:=16;
 		 Awidth: integer:=6;
 		 dept:   integer:=64);
-port(	clk,memEn: in std_logic;	
-		WmemData:	in std_logic_vector(Dwidth-1 downto 0);
-		WmemAddr,RmemAddr:	
-					in std_logic_vector(Awidth-1 downto 0);
-		RmemData: 	out std_logic_vector(Dwidth-1 downto 0)
+port(	clk,memEn: in std_logic;																	-- clk, wren
+		WmemData:	in std_logic_vector(Dwidth-1 downto 0); 					-- datain
+		WmemAddr, RmemAddr:	in std_logic_vector(Awidth-1 downto 0); --writeAddr, readAddr
+					
+		RmemData: 	out std_logic_vector(Dwidth-1 downto 0) 				-- dataOut
 );
 end ProgMem;
 --------------------------------------------------------------
@@ -36,4 +36,5 @@ begin
 	
   RmemData <= sysRAM(conv_integer(RmemAddr));
 
-end behav;
+	end 
+ 
