@@ -19,12 +19,14 @@ package aux_package is
 	end component;
 -----------------------------------------------------------------
 	component AdderSub is
-		GENERIC (length : INTEGER := 16);
-        PORT (  a, b : IN STD_LOGIC_VECTOR (Dwidth-1 DOWNTO 0);
-                result : OUT STD_LOGIC_VECTOR (Dwidth-1 DOWNTO 0);
-                carry_in : in std_logic;
-                sub, carry_out : OUT std_logic);
-    end component;
+		GENERIC (OPC_length : INTEGER := 4;
+					Dwidth : INTEGER := 16);
+		PORT (  a, b : IN STD_LOGIC_VECTOR (Dwidth-1 DOWNTO 0);
+				result : OUT STD_LOGIC_VECTOR (Dwidth-1 DOWNTO 0);
+				carry_in : in std_logic;
+				sub, carry_out : OUT std_logic);
+	end component;
+
 -----------------------------------------------------------------
 	component ProgMem is
 		generic( Dwidth: integer := 16;
@@ -37,14 +39,22 @@ package aux_package is
 		 );	 
 	end component;
 
+	component PC is
+
+	GENERIC (OPC_length : INTEGER := 4;
+	Dwidth: INTEGER := 16);
+	port(	clk, PCin: in std_logic;
+			PCsel:	in std_logic_vector(1 downto 0);
+			offset:	in std_logic_vector(4 downto 0);
+			PC_value :buffer std_logic_vector(Dwidth-1 downto 0)
+	);
+	end component;
 
 
 
 
 
-  
-  
-  
-  
+
+
 end aux_package;
 
