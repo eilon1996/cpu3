@@ -20,18 +20,19 @@ end top;
 architecture arc_sys of top is
 
 -----------logic-------
--- TODO handle get instraction and update PC
+-- TODO handle get instruction and update PC
 
 -- R type
 -- 1 - insert ra to RF
 -- 2 - insert Ra to A, rb to RF
--- 3 - insert Rb to B + calc with A, res enter C, insert rc to RF + enable writing
--- 4 - insert C to out (cout)
+-- 3 - insert Rb to B + calc with A, res enter C
+-- 4 - insert rc to RF + enable writing,  insert C to out (cout)
 
 -- J type
 -- 1 - insert PC to A
--- 2 - insert offset to B + carry_in = 1 + calc with A res enter C
--- 3 - get C out
+-- 2 - if (carry)
+`		-- insert offset to B + sum with A res enter C
+-- 3 - get Cout to pc
 
 -- I type
 --  ?
