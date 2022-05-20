@@ -6,11 +6,11 @@ use ieee.std_logic_unsigned.all;
 entity RF is
 generic( Dwidth: integer:=16;
 		 Awidth: integer:=6);
-port(	clk,rst,WregEn: in std_logic;
-		WregData:	in std_logic_vector(Dwidth-1 downto 0);
-		WregAddr,RregAddr:
+port(	clk,rst,RF_writeEn: in std_logic;
+		RF_write_data:	in std_logic_vector(Dwidth-1 downto 0);
+		RF_write_address,RF_read_address:
 					in std_logic_vector(Awidth-1 downto 0);
-		RregData: 	out std_logic_vector(Dwidth-1 downto 0)
+		RF_read_data: 	out std_logic_vector(Dwidth-1 downto 0)
 );
 end RF;
 --------------------------------------------------------------
@@ -26,15 +26,15 @@ begin
 	if (rst='1') then
 		sysRF(0) <= (others=>'0');   -- R[0] is constant Zero value
 	elsif (clk'event and clk='1') then
-	    if (WregEn='1') then
+	    if (RF_writeEn='1') then
 		    -- index is type of integer so we need to use
 			-- buildin function conv_integer in order to change the type
 		    -- from std_logic_vector to integer
-			sysRF(conv_integer(WregAddr)) <= WregData;
+			sysRF(conv_integer(RF_write_address)) <= RF_write_data;
 	    end if;
 	end if;
   end process;
 
-  RregData <= sysRF(conv_integer(RregAddr));
+  RF_read_data <= sysRF(conv_integer(RF_read_address));
 
 end behav;

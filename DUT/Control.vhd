@@ -102,7 +102,7 @@ begin
 
             when 1 =>
 
-                if opc_type=R_type then
+                if nop='1' then
                 -- insert ra to RF, Ra to A
                     Cout    <=  '0';
                     Cin     <=  '0';
