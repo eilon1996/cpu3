@@ -8,18 +8,20 @@ USE work.aux_package.all;
 entity DataPath is
     generic(    OPC_length: integer := 4;
                 Dwidth: integer := 16;
-                Awidth: integer := 6);
+                Awidth: integer := 6;
+                dept:   integer := 64);
 
     port(       clk, rst, ena  : in std_logic;                                                                  -- basic control
-                Cout, Cin, Ain, weRFen, RFout, IRin, PCin, Imm_in, done : in std_logic;                         -- control
+                Cout, Cin, Ain, wrRFen, RFout, IRin, PCin, Imm_in, done : in std_logic;                         -- control
                 PCsel, RFaddr: in std_logic_vector(1 downto 0);                                                 -- control
 
                 TBactive,RF_writeEn_from_TB, PM_writeEn_from_TB: in std_logic;                                  -- TB controls enable
-                PM_dataIn_tb : in std_logic_vector(Dwidth-1 downto 0);                                          -- TB controls data
-                RF_write_address_from_TB, RF_read_address_from_TB, PM_write_Addr_tb :                           -- TB controls address
+                PM_dataIn_TB : in std_logic_vector(Dwidth-1 downto 0);                                          -- TB controls data
+                RF_write_address_from_TB, RF_read_address_from_TB, PM_write_Addr_TB :                           -- TB controls address
                         in std_logic_vector(Awidth-1 downto 0);
 
-                mov, done_code, nop, jnc, jc, jmp, sub, add, Nflag, Zflag, Cflag: out std_logic                 -- status
+                mov, done_code, nop, jnc, jc, jmp, sub, add, Nflag, Zflag, Cflag: out std_logic;                -- status
+                OPC_out: out std_logic_vector(OPC_length-1 downto 0)                           			-- OPC
     );
     end DataPath;
 --------------------------------------------------------------
@@ -99,8 +101,8 @@ generic map (Awidth => Awidth, Dwidth => Dwidth, OPC_length=>OPC_length)
 port map(
                         clk => clk,
                         PM_writeEn => PM_writeEn_from_TB,
-                        PM_dataIn => PM_dataIn_tb,
-                        PM_writeAddr => PM_write_Addr_tb,
+                        PM_dataIn => PM_dataIn_TB,
+                        PM_writeAddr => PM_write_Addr_TB,
                         PM_readAddr => PC_to_PM_read_address,
                         PM_readData => PM_readData
 );
@@ -130,6 +132,7 @@ port map(
                 Nflag => Nflag
 );
 
+OPC_out <= OPC;
 
 -------- all 3state ------
 

@@ -48,7 +48,8 @@ constant I_type   : std_logic_vector(1 downto 0) := "10";
 
 BEGIN
 
-opc_type <= opc_in(OPC_length-1 downto OPC_length-2);  ---?
+OPC <= OPC_in;
+opc_type <= opc_in(OPC_length-1 downto OPC_length-2);
 PCsel <= "01" when (jmp='1' or (jc='1' and Cflag='1') or (jnc='1' and Cflag='0')) else "10";
 
 
@@ -65,7 +66,7 @@ begin
         PCin    <=  '0';
         Imm_in  <=  '0';
         RFaddr  <=  "00";
-        OPC     <=  "0000";
+       -- OPC     <=  "0000";
         done    <=  '0';
         state := 0;
 
@@ -79,7 +80,7 @@ begin
         PCin    <=  '0';
         Imm_in  <=  '0';
         RFaddr  <=  "00";
-        OPC     <=  "0000";
+       -- OPC     <=  "0000";
         done    <=  '0';
         state := state;
 
@@ -93,7 +94,7 @@ begin
         PCin    <=  '0';
         Imm_in  <=  '0';
         RFaddr  <=  "00";
-        OPC     <=  "0000";
+       -- OPC     <=  "0000";
         done    <=  '1';
         state := 0;
 
@@ -113,7 +114,7 @@ begin
                     PCin    <=  '0';
                     Imm_in  <=  '0';
                     RFaddr  <=  "11";
-                    OPC     <=  "0000";
+                   -- OPC     <=  "0000";
                     done    <=  '0';
                     state := state + 1;
                 elsif opc_type=R_type then
@@ -127,7 +128,7 @@ begin
                     PCin    <=  '0';
                     Imm_in  <=  '0';
                     RFaddr  <=  "00";
-                    OPC     <=  "0000";
+                   -- OPC     <=  "0000";
                     done    <=  '0';
                     state := state + 1;
                 elsif opc_type=J_type then
@@ -141,7 +142,7 @@ begin
                     PCin    <=  '1';
                     Imm_in  <=  '0';
                     RFaddr  <=  "00";
-                    OPC     <=  "0000";
+                   -- OPC     <=  "0000";
                     done    <=  '0';
                     state := state + 1;
 
@@ -156,7 +157,7 @@ begin
                     PCin    <=  '0';
                     Imm_in  <=  '1';
                     RFaddr  <=  "00";
-                    OPC     <=  "0000";
+                   -- OPC     <=  "0000";
                     done    <=  '0';
                     state := state + 1;
                 else
@@ -169,7 +170,7 @@ begin
                     PCin    <=  '0';
                     Imm_in  <=  '0';
                     RFaddr  <=  "00";
-                    OPC     <=  "0000";
+                   -- OPC     <=  "0000";
                     done    <=  '0';
                     state := state;
                 end if;
@@ -187,7 +188,7 @@ begin
                     PCin    <=  '0';
                     Imm_in  <=  '0';
                     RFaddr  <=  "11";
-                    OPC     <=  "0000";
+                   -- OPC     <=  "0000";
                     done    <=  '0';
                     state := state + 1;
                 elsif opc_type=R_type then
@@ -201,7 +202,7 @@ begin
                     PCin    <=  '0';
                     Imm_in  <=  '0';
                     RFaddr  <=  "01";
-                    OPC     <=  "0000";
+                   -- OPC     <=  "0000";
                     done    <=  '0';
                     state := state + 1;
 
@@ -216,7 +217,7 @@ begin
                     PCin    <=  '1';
                     Imm_in  <=  '0';
                     RFaddr  <=  "00";
-                    OPC     <=  "0000";
+                   -- OPC     <=  "0000";
                     done    <=  '1';
                     state := 0;
 
@@ -231,7 +232,7 @@ begin
                     PCin    <=  '0';
                     Imm_in  <=  '1';
                     RFaddr  <=  "00";
-                    OPC     <=  "0000";
+                   -- OPC     <=  "0000";
                     done    <=  '1';
                     state := 0;
                 else
@@ -244,7 +245,7 @@ begin
                     PCin    <=  '0';
                     Imm_in  <=  '0';
                     RFaddr  <=  "00";
-                    OPC     <=  "0000";
+                   -- OPC     <=  "0000";
                     done    <=  '0';
                     state := state;
 
@@ -262,7 +263,7 @@ begin
                     PCin    <=  '0';
                     Imm_in  <=  '0';
                     RFaddr  <=  "11";
-                    OPC     <=  "0000";
+                   -- OPC     <=  "0000";
                     done    <=  '0';
                     state := state + 1;
                 elsif opc_type=R_type then
@@ -276,7 +277,7 @@ begin
                     PCin    <=  '0';
                     Imm_in  <=  '0';
                     RFaddr  <=  "10";
-                    OPC     <=  "0000";
+                   -- OPC     <=  "0000";
                     done    <=  '0';
                     state := state + 1;
                 else
@@ -289,7 +290,7 @@ begin
                     PCin    <=  '0';
                     Imm_in  <=  '0';
                     RFaddr  <=  "00";
-                    OPC     <=  "0000";
+                   -- OPC     <=  "0000";
                     done    <=  '0';
                     state := state;
                 end if;
@@ -305,7 +306,7 @@ begin
                     PCin    <=  '0';
                     Imm_in  <=  '0';
                     RFaddr  <=  "00";
-                    OPC     <=  "0000";
+                   -- OPC     <=  "0000";
                     done    <=  '1';
                     state := 0;
                 else
@@ -318,7 +319,7 @@ begin
                     PCin    <=  '0';
                     Imm_in  <=  '0';
                     RFaddr  <=  "00";
-                    OPC     <=  "0000";
+                   -- OPC     <=  "0000";
                     done    <=  '0';
                     state := state;
                 end if;
