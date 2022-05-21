@@ -4,12 +4,15 @@ USE ieee.std_logic_unsigned.all;
 USE work.aux_package.all;
 -------------------------------------------------------------
 entity Control is
-    GENERIC (OPC_length : INTEGER := 4);
+
+	generic(    OPC_length: integer := 4;
+    Dwidth: integer := 16;
+    Awidth: integer := 6);
 	port(
         rst, ena, clk: in std_logic;    --from tb
         done: out std_logic;            --to tb
 		mov, done_code, nop, jnc, jc, jmp, sub, add, Nflag, Zflag, Cflag : in std_logic;  --status
-		Cout, Cin, Ain, wrRFen, RFout, IRin, PCin, Imm_in : out std_logic;    --control
+		Cout, Cin, Ain, RF_writeEn_control, RFout, IRin, PCin, Imm_in : out std_logic;    --control
         PCsel, RFaddr: out std_logic_vector(1 downto 0);                                    --control
         OPC_in: in std_logic_vector(OPC_length-1 downto 0);                                       --control
         OPC: out std_logic_vector(OPC_length-1 downto 0)                                       --control
@@ -35,7 +38,7 @@ architecture arc_sys of Control is
 -- 2 - done
 
 -- I type
--- 1 - insert ra to writeAddr, wrRFen, immidiet + sign extention to bus,
+-- 1 - insert ra to writeAddr, RF_writeEn_control, immidiet + sign extention to bus,
 -- 2 - done
 
 signal opc_type : std_logic_vector(1 downto 0);
@@ -60,7 +63,7 @@ begin
         Cout    <=  '0';
         Cin     <=  '0';
         Ain     <=  '0';
-        wrRFen  <=  '0';
+        RF_writeEn_control  <=  '0';
         RFout   <=  '0';
         IRin    <=  '0';
         PCin    <=  '0';
@@ -74,7 +77,7 @@ begin
         Cout    <=  '0';
         Cin     <=  '0';
         Ain     <=  '0';
-        wrRFen  <=  '0';
+        RF_writeEn_control  <=  '0';
         RFout   <=  '0';
         IRin    <=  '0';
         PCin    <=  '0';
@@ -88,7 +91,7 @@ begin
         Cout    <=  '0';
         Cin     <=  '0';
         Ain     <=  '0';
-        wrRFen  <=  '0';
+        RF_writeEn_control  <=  '0';
         RFout   <=  '0';
         IRin    <=  '0';
         PCin    <=  '0';
@@ -108,7 +111,7 @@ begin
                     Cout    <=  '0';
                     Cin     <=  '0';
                     Ain     <=  '1';
-                    wrRFen  <=  '0';
+                    RF_writeEn_control  <=  '0';
                     RFout   <=  '1';
                     IRin    <=  '0';
                     PCin    <=  '0';
@@ -122,7 +125,7 @@ begin
                     Cout    <=  '0';
                     Cin     <=  '0';
                     Ain     <=  '1';
-                    wrRFen  <=  '0';
+                    RF_writeEn_control  <=  '0';
                     RFout   <=  '1';
                     IRin    <=  '0';
                     PCin    <=  '0';
@@ -136,7 +139,7 @@ begin
                     Cout    <=  '0';
                     Cin     <=  '0';
                     Ain     <=  '0';
-                    wrRFen  <=  '0';
+                    RF_writeEn_control  <=  '0';
                     RFout   <=  '0';
                     IRin    <=  '0';
                     PCin    <=  '1';
@@ -147,11 +150,11 @@ begin
                     state := state + 1;
 
                 elsif opc_type=I_type then
-                -- insert ra to writeAddr, wrRFen, immidiet + sign extention to bus,
+                -- insert ra to writeAddr, RF_writeEn_control, immidiet + sign extention to bus,
                     Cout    <=  '0';
                     Cin     <=  '0';
                     Ain     <=  '0';
-                    wrRFen  <=  '1';
+                    RF_writeEn_control  <=  '1';
                     RFout   <=  '0';
                     IRin    <=  '0';
                     PCin    <=  '0';
@@ -164,7 +167,7 @@ begin
                     Cout    <=  '0';
                     Cin     <=  '0';
                     Ain     <=  '0';
-                    wrRFen  <=  '0';
+                    RF_writeEn_control  <=  '0';
                     RFout   <=  '0';
                     IRin    <=  '0';
                     PCin    <=  '0';
@@ -182,7 +185,7 @@ begin
                     Cout    <=  '0';
                     Cin     <=  '1';
                     Ain     <=  '0';
-                    wrRFen  <=  '0';
+                    RF_writeEn_control  <=  '0';
                     RFout   <=  '1';
                     IRin    <=  '0';
                     PCin    <=  '0';
@@ -196,7 +199,7 @@ begin
                     Cout    <=  '0';
                     Cin     <=  '1';
                     Ain     <=  '0';
-                    wrRFen  <=  '0';
+                    RF_writeEn_control  <=  '0';
                     RFout   <=  '1';
                     IRin    <=  '0';
                     PCin    <=  '0';
@@ -211,7 +214,7 @@ begin
                     Cout    <=  '0';
                     Cin     <=  '0';
                     Ain     <=  '0';
-                    wrRFen  <=  '0';
+                    RF_writeEn_control  <=  '0';
                     RFout   <=  '0';
                     IRin    <=  '0';
                     PCin    <=  '1';
@@ -222,11 +225,11 @@ begin
                     state := 0;
 
                 elsif opc_type=I_type then
-                -- insert ra to writeAddr, wrRFen, immidiet + sign extention to bus,
+                -- insert ra to writeAddr, RF_writeEn_control, immidiet + sign extention to bus,
                     Cout    <=  '0';
                     Cin     <=  '0';
                     Ain     <=  '0';
-                    wrRFen  <=  '0';
+                    RF_writeEn_control  <=  '0';
                     RFout   <=  '0';
                     IRin    <=  '0';
                     PCin    <=  '0';
@@ -239,7 +242,7 @@ begin
                     Cout    <=  '0';
                     Cin     <=  '0';
                     Ain     <=  '0';
-                    wrRFen  <=  '0';
+                    RF_writeEn_control  <=  '0';
                     RFout   <=  '0';
                     IRin    <=  '0';
                     PCin    <=  '0';
@@ -257,7 +260,7 @@ begin
                     Cout    <=  '1';
                     Cin     <=  '0';
                     Ain     <=  '0';
-                    wrRFen  <=  '1';
+                    RF_writeEn_control  <=  '1';
                     RFout   <=  '0';
                     IRin    <=  '0';
                     PCin    <=  '0';
@@ -271,7 +274,7 @@ begin
                     Cout    <=  '1';
                     Cin     <=  '0';
                     Ain     <=  '0';
-                    wrRFen  <=  '1';
+                    RF_writeEn_control  <=  '1';
                     RFout   <=  '0';
                     IRin    <=  '0';
                     PCin    <=  '0';
@@ -284,7 +287,7 @@ begin
                     Cout    <=  '0';
                     Cin     <=  '0';
                     Ain     <=  '0';
-                    wrRFen  <=  '0';
+                    RF_writeEn_control  <=  '0';
                     RFout   <=  '0';
                     IRin    <=  '0';
                     PCin    <=  '0';
@@ -300,7 +303,7 @@ begin
                     Cout    <=  '0';
                     Cin     <=  '0';
                     Ain     <=  '0';
-                    wrRFen  <=  '0';
+                    RF_writeEn_control  <=  '0';
                     RFout   <=  '0';
                     IRin    <=  '0';
                     PCin    <=  '0';
@@ -313,7 +316,7 @@ begin
                     Cout    <=  '0';
                     Cin     <=  '0';
                     Ain     <=  '0';
-                    wrRFen  <=  '0';
+                    RF_writeEn_control  <=  '0';
                     RFout   <=  '0';
                     IRin    <=  '0';
                     PCin    <=  '0';

@@ -9,16 +9,18 @@ entity DataPath is
     generic(    OPC_length: integer := 4;
                 Dwidth: integer := 16;
                 Awidth: integer := 6;
+                regAddrWidth: integer := 4;
                 dept:   integer := 64);
 
     port(       clk, rst, ena  : in std_logic;                                                                  -- basic control
-                Cout, Cin, Ain, wrRFen, RFout, IRin, PCin, Imm_in, done : in std_logic;                         -- control
+                Cout, Cin, Ain, RF_writeEn_control, RFout, IRin, PCin, Imm_in, done : in std_logic;                         -- control
                 PCsel, RFaddr: in std_logic_vector(1 downto 0);                                                 -- control
 
                 TBactive,RF_writeEn_from_TB, PM_writeEn_from_TB: in std_logic;                                  -- TB controls enable
                 PM_dataIn_TB : in std_logic_vector(Dwidth-1 downto 0);                                          -- TB controls data
-                RF_write_address_from_TB, RF_read_address_from_TB, PM_write_Addr_TB :                           -- TB controls address
-                        in std_logic_vector(Awidth-1 downto 0);
+                PM_write_Addr_TB :  in std_logic_vector(Awidth-1 downto 0);                                     -- TB controls address PM
+                RF_write_address_from_TB, RF_read_address_from_TB : in std_logic_vector(regAddrWidth-1 downto 0); -- TB controls address RF
+
 
                 mov, done_code, nop, jnc, jc, jmp, sub, add, Nflag, Zflag, Cflag: out std_logic;                -- status
                 OPC_out: out std_logic_vector(OPC_length-1 downto 0)                           			-- OPC
@@ -32,7 +34,7 @@ architecture DPArch of DataPath is
 
 --RF
 signal RF_write_data, RF_read_data: std_logic_vector(Dwidth-1 downto 0);
-signal RF_write_address, RF_read_address: std_logic_vector(Awidth-1 downto 0);
+signal RF_write_address, RF_read_address: std_logic_vector(regAddrWidth-1 downto 0);
 signal RF_writeEn : std_logic;
 
 
@@ -45,23 +47,22 @@ signal PM_writeEn: std_logic;
 
 
 --IR
-signal IR, RF_addr_from_IR: std_logic_vector(Dwidth-1 downto 0);
+signal IR: std_logic_vector(Dwidth-1 downto 0);
+signal RF_addr_from_IR: std_logic_vector(regAddrWidth-1 downto 0);
 
-signal PC_out: std_logic_vector(Awidth-1 downto 0);
 signal BUS_DATA: std_logic_vector(Dwidth-1 downto 0);
 
 signal REG_A, REG_C: std_logic_vector(Dwidth-1 downto 0);
 
-signal RF_writeEn_control: std_logic;
-signal PC_to_PM_read_address: std_logic_vector(Dwidth-1 downto 0);
+signal PC_to_PM_read_address: std_logic_vector(Awidth-1 downto 0);
 
 
 --------------- alias ------------
 
-alias OPC :std_logic_vector(3 downto 0) is IR(15 downto 12);
-alias ra : std_logic_vector(3 downto 0) is IR(11 downto 8);
-alias rb : std_logic_vector(3 downto 0) is IR(7 downto 4);
-alias rc : std_logic_vector(3 downto 0) is IR(3 downto 0);
+alias OPC :std_logic_vector(OPC_length-1 downto 0) is IR(15 downto 12);
+alias ra : std_logic_vector(regAddrWidth-1 downto 0) is IR(11 downto 8);
+alias rb : std_logic_vector(regAddrWidth-1 downto 0) is IR(7 downto 4);
+alias rc : std_logic_vector(regAddrWidth-1 downto 0) is IR(3 downto 0);
 alias offset : std_logic_vector(4 downto 0) is IR(4 downto 0);
 alias immidiet : std_logic_vector(7 downto 0) is IR(7 downto 0);
 
@@ -97,7 +98,7 @@ port map(
 );
 
 ProgMem_PM: ProgMem
-generic map (Awidth => Awidth, Dwidth => Dwidth, OPC_length=>OPC_length)
+generic map (Awidth => Awidth, Dwidth => Dwidth, dept=>dept)
 port map(
                         clk => clk,
                         PM_writeEn => PM_writeEn_from_TB,
@@ -109,7 +110,7 @@ port map(
 
 
 RF_PM:     RF
-generic map (Awidth => Awidth, Dwidth => Dwidth, OPC_length=>OPC_length)
+generic map (Awidth => regAddrWidth, Dwidth => Dwidth)
 port map(
                         clk => clk,
                         rst => rst,
@@ -140,8 +141,8 @@ BUS_DATA <= REG_C when (Cout = '1') else (others => 'Z');
 
 BUS_DATA <= RF_read_data when (RFout = '1') else (others => 'Z');
 
-BUS_DATA(7 downto 0) <= IR(7 downto 0) when (Imm_in = '1') else (others => 'Z');
-BUS_DATA(15 downto 8) <= (others => IR(7)) when (Imm_in = '1') else (others => 'Z');
+BUS_DATA(7 downto 0) <= immidiet when (Imm_in = '1') else (others => 'Z');
+BUS_DATA(15 downto 8) <= (others => immidiet(7)) when (Imm_in = '1') else (others => 'Z');
 
 
 

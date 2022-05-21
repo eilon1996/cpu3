@@ -28,7 +28,7 @@ BEGIN
 sub <= '1' when OPC="0001" else '0';
 carry_in <= '1' when OPC(3 downto 2) ="01" else '0';
 AdderSub_pm: AdderSub
-generic map (Awidth => Awidth, Dwidth => Dwidth, OPC_length=>OPC_length)
+generic map (Dwidth => Dwidth)
 port map(
     sub => sub,
     carry_in => carry_in,

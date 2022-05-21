@@ -5,7 +5,7 @@ use ieee.std_logic_unsigned.all;
 --------------------------------------------------------------
 entity RF is
 generic( Dwidth: integer:=16;
-		 Awidth: integer:=6);
+		 Awidth: integer:=4);
 port(	clk,rst,RF_writeEn: in std_logic;
 		RF_write_data:	in std_logic_vector(Dwidth-1 downto 0);
 		RF_write_address,RF_read_address:

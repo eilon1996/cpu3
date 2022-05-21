@@ -7,14 +7,15 @@ entity top is
 	generic(    OPC_length: integer := 4;
 				Dwidth: integer := 16;
 				Awidth: integer := 6;
-				dept:   integer := 64);
+                regAddrWidth: integer := 4;
+                dept:   integer := 64);
 
 	port(       clk, rst, ena  : in std_logic;                                                                  -- basic control
 
 				TBactive,RF_writeEn_from_TB, PM_writeEn_from_TB: in std_logic;                                  -- TB controls enable
 				PM_dataIn_TB : in std_logic_vector(Dwidth-1 downto 0);                                          -- TB controls data
-				RF_write_address_from_TB, RF_read_address_from_TB, PM_write_Addr_TB :                           -- TB controls address
-						in std_logic_vector(Awidth-1 downto 0);
+				RF_write_address_from_TB, RF_read_address_from_TB : in std_logic_vector(regAddrWidth-1 downto 0);
+				PM_write_Addr_TB : in std_logic_vector(Awidth-1 downto 0);
 				done : out std_logic
 
 	);
@@ -22,7 +23,7 @@ end top;
 ------------- complete the top Architecture code --------------
 architecture arc_sys of top is
 
-signal	Cout, Cin, Ain, wrRFen, RFout, IRin, PCin, Imm_in : std_logic;                         -- control
+signal	Cout, Cin, Ain, RF_writeEn_control, RFout, IRin, PCin, Imm_in : std_logic;                         -- control
 signal	PCsel, RFaddr: std_logic_vector(1 downto 0);                                                 -- control
 
 signal	mov, done_code, nop, jnc, jc, jmp, sub, add, Nflag, Zflag, Cflag, done_buffer: std_logic;                 -- status
@@ -42,7 +43,7 @@ port map(
 	Cout		=> 	Cout		,
 	Cin			=> 	Cin			,
 	Ain			=> 	Ain			,
-	wrRFen		=> 	wrRFen		,
+	RF_writeEn_control		=> 	RF_writeEn_control		,
 	RFout		=> 	RFout		,
 	IRin		=> 	IRin		,
 	PCin		=> 	PCin		,
@@ -67,7 +68,7 @@ port map(
 );
 
 DataPath_PM: DataPath
-generic map (Awidth => Awidth, Dwidth => Dwidth, OPC_length=>OPC_length, dept=>dept)
+generic map (Awidth => Awidth, Dwidth => Dwidth, OPC_length=>OPC_length, dept=>dept, regAddrWidth=>regAddrWidth)
 port map(
 	clk 		=> clk			,
 	rst 		=> rst			,
@@ -85,7 +86,7 @@ port map(
 	Cout		=> 	Cout		,
 	Cin			=> 	Cin			,
 	Ain			=> 	Ain			,
-	wrRFen		=> 	wrRFen		,
+	RF_writeEn_control		=> 	RF_writeEn_control		,
 	RFout		=> 	RFout		,
 	IRin		=> 	IRin		,
 	PCin		=> 	PCin		,

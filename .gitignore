@@ -8,6 +8,7 @@ DUT/*
 !TB/
 TB/*
 !TB/tb_*.vhd
+!TB/*.txt
 !SIM/
 SIM/*
 !SIM/*.do
