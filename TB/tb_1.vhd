@@ -3,7 +3,7 @@ use ieee.std_logic_1164.all;
 use ieee.std_logic_arith.all;
 use ieee.numeric_std.all;
 use ieee.std_logic_unsigned.all;
-USE work.aux_package.all;
+--USE work.aux_package.all;
 
 
 use ieee.std_logic_textio.all;
@@ -32,41 +32,47 @@ architecture xxxx of tb_2 is
 
 begin
 
-	top_PM: top
+	-- top_PM: top
 
-	generic map (Awidth => Awidth, Dwidth => Dwidth, dept=>dept, regAddrWidth=>regAddrWidth)
+	-- generic map (Awidth => Awidth, Dwidth => Dwidth, dept=>dept, regAddrWidth=>regAddrWidth)
 
-	port map(
-					clk 						=> clk			,
-					rst 						=> rst			,
-					ena 						=> ena			,
-					TBactive					=> TBactive						,
-					RF_writeEn_from_TB			=> RF_writeEn_from_TB			,
-					PM_writeEn_from_TB     		=> PM_writeEn_from_TB     		,
-					PM_dataIn_TB				=> PM_dataIn_TB					,
-					RF_write_address_from_TB	=> RF_write_address_from_TB		,
-					RF_read_address_from_TB		=> RF_read_address_from_TB		,
-					PM_write_Addr_TB			=> PM_write_Addr_TB
-		);
+	-- port map(
+	-- 				clk 						=> clk			,
+	-- 				rst 						=> rst			,
+	-- 				ena 						=> ena			,
+	-- 				TBactive					=> TBactive						,
+	-- 				RF_writeEn_from_TB			=> RF_writeEn_from_TB			,
+	-- 				PM_writeEn_from_TB     		=> PM_writeEn_from_TB     		,
+	-- 				PM_dataIn_TB				=> PM_dataIn_TB					,
+	-- 				RF_write_address_from_TB	=> RF_write_address_from_TB		,
+	-- 				RF_read_address_from_TB		=> RF_read_address_from_TB		,
+	-- 				PM_write_Addr_TB			=> PM_write_Addr_TB
+	-- 	);
 
 p: process
 	file RAMinit : text open read_mode is "C:\Users\eilon.toledano\Desktop\study\CPU\labs\LAB3\TB\RAMinit.txt";
 	file output : text open write_mode is "C:\Users\eilon.toledano\Desktop\study\CPU\labs\LAB3\TB\output.txt";
 	variable L : line;
-	variable PM_dataIn_TB : std_logic_vector(3 downto 0);
+	variable PM_dataIn_TB : std_logic_vector(Dwidth-1 downto 0);
 
 	begin
 
-		while not endfile(RAMinit) loop
+		--while not endfile(RAMinit) loop
 			readline(RAMinit, L);
 			hread(L, PM_dataIn_TB);	-- read hexa
 			report "report read" severity note;
+			wait for (5 ns);
+			wait;
 
-			write(L, to_bitvector(PM_dataIn_TB), left, 10);
+			hwrite(L, PM_dataIn_TB);
 			writeline(output, L);
 			report "report write" severity note;
-		end loop;
+			wait for (5 ns);
+		--end loop;
 
+		file_close(RAMinit);
+		file_close(output);
+		wait;
 end process;
 
 end xxxx;
