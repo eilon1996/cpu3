@@ -50,85 +50,32 @@ begin
 	-- 	);
 
 p: process
-	file RAMinit : text open read_mode is "C:\Users\eilon.toledano\Desktop\study\CPU\labs\LAB3\TB\RAMinit.txt";
-	file output : text open write_mode is "C:\Users\eilon.toledano\Desktop\study\CPU\labs\LAB3\TB\output.txt";
+	file RAMinit : text open read_mode is "D:\Users\barryyos\Documents\CPU_Labs\cpu3\TB\RAMinit.txt";
+	file output : text open write_mode is "D:\Users\barryyos\Documents\CPU_Labs\cpu3\TB\output.txt";
 	variable L : line;
 	variable PM_dataIn_TB : std_logic_vector(Dwidth-1 downto 0);
 
 	begin
 
-		--while not endfile(RAMinit) loop
+		while not endfile(RAMinit) loop
 			readline(RAMinit, L);
 			hread(L, PM_dataIn_TB);	-- read hexa
 			report "report read" severity note;
 			wait for (5 ns);
-			wait;
+			--wait;
 
 			hwrite(L, PM_dataIn_TB);
 			writeline(output, L);
 			report "report write" severity note;
-			wait for (5 ns);
-		--end loop;
+	  end loop;
 
-		file_close(RAMinit);
-		file_close(output);
-		wait;
-end process;
+  file_close(RAMinit);
+  file_close(output);
+  wait;
+  end process;
 
 end xxxx;
 
 
 
 
--- 	file RAMinit 	: text open read_mode is "RAMinit.txt";
--- 	file RFcontent 	: text open read_mode is "RFcontent.txt";
--- 	file RFinit 	: text open read_mode is "RFinit.txt";
--- 	file output 	: text open write_mode is "output.txt";
-
--- 	Variable RAMinit_L	:	std_logic_vector(Dwidth-1 downto 0);
--- 	Variable RFcontent_L:	std_logic_vector(Dwidth-1 downto 0);
--- 	Variable RFinit_L 	:	std_logic_vector(Dwidth-1 downto 0);
--- 	Variable output_L 	:	std_logic_vector(Dwidth-1 downto 0);
--- 	Variable PM_dataIn_TB_bits : bit_vector(Dwidth-1 downto 0);
--- 	Variable PM_dataIn_TB_bits2 : string(0 to Dwidth-1);
-
--- 	variable L : line;
--- 	variable good : boolean;
--- 	variable clk_delay: time := 50 ns;
-
--- 	function to_std_logic_vector(a : string) return std_logic_vector is
--- 		variable ret : std_logic_vector(a'length*8-1 downto 0);
--- 	begin
--- 		for i in a'range loop
--- 			ret(i*8+7 downto i*8) := std_logic_vector(to_unsigned(character'pos(a(i)), 8));
--- 		end loop;
--- 		return ret;
--- 	end function to_std_logic_vector;
-
--- 	begin
--- 	--------- start of stimulus section ------------------
--- 	TBactive <= '1';
--- 	ena <= '0';
--- 	clk <= '0';
-
-
--- 	PM_writeEn_from_TB <= '1';
--- 	PM_write_Addr_TB <= (others => '0');
--- 	RAMinit_L := (others => '0');
--- 	while not endfile(RAMinit) loop
--- 		readline(RAMinit, L);
--- 		read(L, PM_dataIn_TB_bits2, good);
--- 		next when not good;
--- 		PM_dataIn_TB	<= RAMinit_L;
--- 		PM_write_Addr_TB <= to_std_logic_vector(PM_dataIn_TB_bits2) + 1;
--- 		clk <= '1';
--- 		wait for (clk_delay);
--- 		clk <= '0';
--- 		wait for (clk_delay);
-
--- 		assert false
--- 			report PM_dataIn_TB_bits2
--- 			severity Note;
--- 	end loop;
--- 	end process;
--- end architecture rtb;

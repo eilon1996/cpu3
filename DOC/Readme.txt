@@ -1,12 +1,12 @@
-lab2 - VHDL
+lab3 - VHDL
 Barry Yosilevich - 208725218
 Eilon Toledano - 206903445
 
 .vhd file functional description:
 
 
-Adder.vhd:
-- Implements an n-bit adder with carry:
+top.vhd:
+- Implements a central proccesing unit:
 - ports functional description:
  	+ a, b: binary vectors of length n - representing numbers to be summerized or substructed ( x-y operation)
 	+ cin: carry in to take in calculation
