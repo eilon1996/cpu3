@@ -7,10 +7,10 @@ entity ProgMem is
 generic( Dwidth: integer:=16;
 		 Awidth: integer:=6;
 		 dept:   integer:=64);
-port(	clk,PM_writeEn: in std_logic;											-- clk, wren
-		PM_dataIn:	in std_logic_vector(Dwidth-1 downto 0); 					-- datain
+port(	clk,PM_writeEn: in std_logic;																				-- clk, wren
+		PM_dataIn:	in std_logic_vector(Dwidth-1 downto 0); 									-- datain
 		PM_writeAddr, PM_readAddr:	in std_logic_vector(Awidth-1 downto 0); 	-- writeAddr, readAddr
-		PM_readData: 	out std_logic_vector(Dwidth-1 downto 0) 				-- dataOut
+		PM_readData: 	out std_logic_vector(Dwidth-1 downto 0) 								-- dataOut
 );
 end ProgMem;
 --------------------------------------------------------------
@@ -26,7 +26,7 @@ begin
 	if (clk'event and clk='1') then
 	    if (PM_writeEn='1') then
 		    -- index is type of integer so we need to use
-			-- buildin function conv_integer in order to change the type
+				-- buildin function conv_integer in order to change the type
 		    -- from std_logic_vector to integer
 			sysRAM(conv_integer(PM_writeAddr)) <= PM_dataIn;
 	    end if;

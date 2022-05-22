@@ -92,14 +92,14 @@ package aux_package is
 					PCsel, RFaddr: in std_logic_vector(1 downto 0);                                                 -- control
 
 					TBactive,RF_writeEn_from_TB, PM_writeEn_from_TB: in std_logic;                                  -- TB controls enable
-					PM_dataIn_TB : in std_logic_vector(Dwidth-1 downto 0);                              -- TB controls data
+					PM_dataIn_TB, RF_write_data_from_TB : in std_logic_vector(Dwidth-1 downto 0);                                          -- TB controls data
 					PM_write_Addr_TB :  in std_logic_vector(Awidth-1 downto 0);                                     -- TB controls address PM
 					RF_write_address_from_TB, RF_read_address_from_TB : in std_logic_vector(regAddrWidth-1 downto 0); -- TB controls address RF
 
-
 					mov, done_code, nop, jnc, jc, jmp, sub, add, Nflag, Zflag, Cflag: out std_logic;                 -- status
-					OPC_out: out std_logic_vector(OPC_length-1 downto 0)                                  			-- OPC
-		);
+					OPC_out: out std_logic_vector(OPC_length-1 downto 0);                           					-- OPC
+					RF_read_data_TB : out std_logic_vector(Dwidth-1 downto 0)-- TB controls data
+					);                                         
 		end component;
 
 -----------------------------------------------------------------
@@ -112,10 +112,11 @@ package aux_package is
 
 		port(       clk, rst, ena  : in std_logic;                                                                  -- basic control
 
-					TBactive,RF_writeEn_from_TB, PM_writeEn_from_TB: in std_logic;                                  -- TB controls enable
-					PM_dataIn_TB : in std_logic_vector(Dwidth-1 downto 0);                                     -- TB controls data
+					TBactive,RF_writeEn_from_TB, PM_writeEn_from_TB: in std_logic;                  -- TB controls enable
+					PM_dataIn_TB, RF_write_data_from_TB : in std_logic_vector(Dwidth-1 downto 0);                                -- TB controls data
 					RF_write_address_from_TB, RF_read_address_from_TB : in std_logic_vector(regAddrWidth-1 downto 0);
-					PM_write_Addr_TB : in std_logic_vector(Awidth-1 downto 0);
+					PM_write_Addr_TB : in std_logic_vector(Awidth-1 downto 0); -- OPC
+					RF_read_data_TB : out std_logic_vector(Dwidth-1 downto 0); 
 					done : out std_logic
 
 		);
