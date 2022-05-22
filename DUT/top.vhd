@@ -12,10 +12,11 @@ entity top is
 
 	port(       clk, rst, ena  : in std_logic;                                                                  -- basic control
 
-				TBactive,RF_writeEn_from_TB, PM_writeEn_from_TB: in std_logic;                                  -- TB controls enable
-				PM_dataIn_TB : in std_logic_vector(Dwidth-1 downto 0);                                          -- TB controls data
+				TBactive,RF_writeEn_from_TB, PM_writeEn_from_TB: in std_logic;                  -- TB controls enable
+				PM_dataIn_TB, RF_write_data_from_TB : in std_logic_vector(Dwidth-1 downto 0);                                -- TB controls data
 				RF_write_address_from_TB, RF_read_address_from_TB : in std_logic_vector(regAddrWidth-1 downto 0);
-				PM_write_Addr_TB : in std_logic_vector(Awidth-1 downto 0);
+				PM_write_Addr_TB : in std_logic_vector(Awidth-1 downto 0); -- OPC
+				RF_read_data_TB : out std_logic_vector(Dwidth-1 downto 0); 
 				done : out std_logic
 
 	);
@@ -31,7 +32,7 @@ signal	OPC_buffer: std_logic_vector(OPC_length-1 downto 0);                     
 
 BEGIN
 
-done <= done_buffer;
+done <= done_code;	-- done program
 
 Control_PM: Control
 generic map (Awidth => Awidth, Dwidth => Dwidth, OPC_length=>OPC_length)
@@ -106,7 +107,8 @@ port map(
 	Nflag		=> 	Nflag		,
 	Zflag		=> 	Zflag		,
 	Cflag		=> 	Cflag		,
-	OPC_out		=> 	OPC_buffer
+	OPC_out		=> 	OPC_buffer,
+	RF_write_data_from_TB => RF_write_data_from_TB
 );
 
 

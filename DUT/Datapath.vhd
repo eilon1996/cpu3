@@ -17,13 +17,14 @@ entity DataPath is
                 PCsel, RFaddr: in std_logic_vector(1 downto 0);                                                 -- control
 
                 TBactive,RF_writeEn_from_TB, PM_writeEn_from_TB: in std_logic;                                  -- TB controls enable
-                PM_dataIn_TB : in std_logic_vector(Dwidth-1 downto 0);                                          -- TB controls data
+                PM_dataIn_TB, RF_write_data_from_TB : in std_logic_vector(Dwidth-1 downto 0);                                          -- TB controls data
                 PM_write_Addr_TB :  in std_logic_vector(Awidth-1 downto 0);                                     -- TB controls address PM
                 RF_write_address_from_TB, RF_read_address_from_TB : in std_logic_vector(regAddrWidth-1 downto 0); -- TB controls address RF
 
 
                 mov, done_code, nop, jnc, jc, jmp, sub, add, Nflag, Zflag, Cflag: out std_logic;                -- status
-                OPC_out: out std_logic_vector(OPC_length-1 downto 0)                           			-- OPC
+                OPC_out: out std_logic_vector(OPC_length-1 downto 0);                          			-- OPC
+                RF_read_data_TB : out std_logic_vector(Dwidth-1 downto 0)                                        -- TB controls data
     );
     end DataPath;
 --------------------------------------------------------------
@@ -115,7 +116,7 @@ port map(
                         clk => clk,
                         rst => rst,
                         RF_writeEn => RF_writeEn,
-                        RF_write_data => BUS_DATA,
+                        RF_write_data => RF_write_data,
                         RF_write_address => RF_write_address,
                         RF_read_address => RF_read_address,
                         RF_read_data => RF_read_data
@@ -140,6 +141,7 @@ OPC_out <= OPC;
 BUS_DATA <= REG_C when (Cout = '1') else (others => 'Z');
 
 BUS_DATA <= RF_read_data when (RFout = '1') else (others => 'Z');
+RF_read_data_TB <= RF_read_data when (RFout = '1') else (others => 'Z');
 
 BUS_DATA(7 downto 0) <= immidiet when (Imm_in = '1') else (others => 'Z');
 BUS_DATA(15 downto 8) <= (others => immidiet(7)) when (Imm_in = '1') else (others => 'Z');
@@ -160,6 +162,7 @@ RF_read_address <= RF_read_address_from_TB when TBactive='1' else RF_addr_from_I
 RF_write_address <= RF_write_address_from_TB when TBactive='1' else RF_addr_from_IR;
 RF_writeEn <= RF_writeEn_from_TB when TBactive='1' else RF_writeEn_control;
 
+RF_write_data <= RF_write_data_from_TB when TBactive='1' else BUS_DATA;
 IR <= PM_readData when IRin = '1' else UNAFFECTED;
 
 
