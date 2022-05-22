@@ -8,40 +8,26 @@ Eilon Toledano - 206903445
 top.vhd:
 - Implements a central proccesing unit:
 - ports functional description:
- 	+ a, b: binary vectors of length n - representing numbers to be summerized or substructed ( x-y operation)
-	+ cin: carry in to take in calculation
- 	+ cout: carry out
- 	+ s: the addition result
+ 	+ clk, rst, ena: control lines for the unit
+	+ PM_write_Addr_TB, RF_write_address_from_TB, RF_read_address_from_TB ,PM_dataIn_TB, TBactive, RF_writeEn_from_TB, PM_writeEn_from_TB: activating/ disactivating test bench content muxing.
+	+ done: TB finish flag
+
+RF.vhd:
+- Implements register file architecture:
+- ports functional description:
+	+ clk, rst, RF_writeEn: control lines for the unit
+	+ RF_write_data
 
 
 
-aux_package.vhd:
-- gathers entire system's components in on package.
+AdderSub.vhd:    a block used for addition and substraction
+ALU.vhd:         a block responsible for all arithemetic function
+aux_package.vhd: a general package containing component definitions
+Control.vhd:     a block which includes the fsm which controls the signals used in the datapath
+Datapath.vhd:    a block which recieves control signals and input and generates the output.
+FA.vhd:          a full header.. used for adderSub block.
+Logic.vhd:       a block that performs the logical operations.
 
-
-top.vhd:
-- descripts a synchronous digital system which detects valid sub series for a given condition value (noted at the task pdf file), consists of three concurrent proccesses (acting as a pipeline):
-  1st process:  given an input series x, it outputs 2 serieses which demonstrate a -2, and -1 delay of the input series.
-	- sensitive list:
-		+ x: input series
-		+ rst: reset line
-		+ clk: clock line
-		+ ena: enable line
-  2nd process:  given 2 input series (from process 1), calculates the substraction result between the two serieses (element-wise) and outputs '1' whether the substraction result matches the detection code, else '0'.
-	- sensitive list:
-		+ rst: reset line
-		+ clk: clock line
-		+ ena: enable line
-		+ valid:  validity of the substraction results
-  3rd process: counts input valid bits in a row (from process 2), outputs '1' if there are more than m bits in a row at a given time, '0' else.
-	- sensitive list:
-		+ rst: reset line
-		+ clk: clock line
-		+ ena: enable line
-		+ valid:  validity of the substraction results
-
-- port functional description:
-	+ rst, ena, clk: system control lines
-	+ x: input binary vector to manipulate on.
-	+ DetectionCode: process 2 input detection code - to compare with substraction result.
-	+ detector: system output - holds whether there's a valid (by defined means) sub-series of x.
+ControlTB.vhd:   a simple tb for the control.
+DatapathTB.vhd:  a simple tb for the datapath.
+topTB.vhd:       a tb which parses input from a file and sends it to the top arch and reads the output from the block and writes them to a diffrent file.
