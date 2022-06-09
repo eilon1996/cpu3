@@ -43,7 +43,7 @@ generic map(
 port map(
     sub => '0',
     carry_in => '0',
-    a => PC_value_plus1,
+    a => PC_buffer,
     b => offset_extend,
     result => PC_value_plus_offset
 );
@@ -56,7 +56,7 @@ begin
         when "00" => PC_buffer <= (others => '0');
         when "01" => PC_buffer <= PC_value_plus_offset;
         when "10" => PC_buffer <= PC_value_plus1;
-        when others => PC_buffer <= PC_buffer;
+        when others => PC_out <= PC_buffer;
       end case;
 
     end if;
